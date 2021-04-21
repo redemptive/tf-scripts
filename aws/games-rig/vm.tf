@@ -3,7 +3,7 @@ data "aws_ami" "rig_ami" {
 
   filter {
     name   = "name"
-    values = ["Windows_Server-2019-English-Full-Base-*"]
+    values = var.os_image_name
   }
 
   filter {
@@ -11,7 +11,7 @@ data "aws_ami" "rig_ami" {
     values = ["hvm"]
   }
 
-  owners = ["801119661308"]
+  owners = var.os_image_owner
 }
 
 resource "aws_network_interface" "rig_ni" {
