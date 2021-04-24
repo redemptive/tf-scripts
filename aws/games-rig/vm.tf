@@ -18,22 +18,22 @@ resource "aws_network_interface" "rig_ni" {
   subnet_id   = aws_subnet.rig_subnet.id
   security_groups = [aws_security_group.rig_sg.id]
 
-  tags = {
-    Name = "interface_1"
-  }
+  tags = merge({
+    Name = "${var.prefix}-rig-ni"
+  }, var.common_tags)
 }
 
 resource "aws_security_group" "rig_sg" {
-  name        = "rig_sg"
+  name        = "${var.prefix}-sg"
   description = "Allow RDP inbound traffic"
-  vpc_id      = aws_vpc.game_now_vpc.id
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     description      = "RDP"
-    from_port        = 3389
-    to_port          = 3389
+    from_port        = var.rig_whitelist_port
+    to_port          = var.rig_whitelist_port
     protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    cidr_blocks      = [var.user_cidr]
   }
 
   egress {
@@ -43,9 +43,9 @@ resource "aws_security_group" "rig_sg" {
     cidr_blocks      = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "rig_sg"
-  }
+  tags = merge({
+    Name = "${var.prefix}-rig-sg"
+  }, var.common_tags)
 }
 
 resource "aws_instance" "rig_instance" {
@@ -61,9 +61,9 @@ resource "aws_instance" "rig_instance" {
     device_index         = 0
   }
 
-  tags = {
-    Name = "Rig1"
-  }
+  tags = merge({
+    Name = "${var.prefix}-rig"
+  }, var.common_tags)
 
-  depends_on = [aws_internet_gateway.rig_igw]
+  depends_on = [aws_internet_gateway.igw]
 }

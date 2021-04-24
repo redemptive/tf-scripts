@@ -1,41 +1,41 @@
-resource "aws_vpc" "game_now_vpc" {
-  cidr_block = "10.0.0.0/16"
+resource "aws_vpc" "main" {
+  cidr_block = var.vpc_cidr
 
-  tags = {
-    "Name" = "GameNowVPC"
-  }
+  tags = merge({
+    "Name" = "${var.prefix}-vpc"
+  }, var.common_tags)
 }
 
 resource "aws_subnet" "rig_subnet" {
-  vpc_id     = aws_vpc.game_now_vpc.id
-  cidr_block = "10.0.0.0/24"
+  vpc_id     = aws_vpc.main.id
+  cidr_block = var.rig_subnet_cidr
 
   map_public_ip_on_launch = true
 
-  tags = {
-    Name = "RigSubnet"
-  }
+  tags = merge({
+    Name = "${var.prefix}-rig-subnet"
+  }, var.common_tags)
 }
 
-resource "aws_internet_gateway" "rig_igw" {
-  vpc_id = aws_vpc.game_now_vpc.id
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.main.id
 
-  tags = {
-    Name = "RigIGW"
-  }
+  tags = merge({
+    Name = "${var.prefix}-igw"
+  }, var.common_tags)
 }
 
 resource "aws_route_table" "rig_rt" {
-  vpc_id = aws_vpc.game_now_vpc.id
+  vpc_id = aws_vpc.main.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.rig_igw.id
+    gateway_id = aws_internet_gateway.igw.id
   }
 
-  tags = {
-    Name = "RigRT"
-  }
+  tags = merge({
+    Name = "${var.prefix}-rig-rt"
+  }, var.common_tags)
 }
 
 resource "aws_route_table_association" "rig_rt_assoc" {
