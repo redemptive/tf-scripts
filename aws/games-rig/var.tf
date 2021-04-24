@@ -1,3 +1,7 @@
+variable "region" {
+  default = "eu-west-2"
+}
+
 variable "common_tags" {
   default = { "ManagedBy" = "Terraform"}
 }
